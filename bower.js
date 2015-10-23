@@ -176,7 +176,7 @@ BowerEndpoint.prototype.download = function (endpoint, version, hash, meta, dir,
 				mout.object.deepMixIn(config, bowerConfig);
 
 				//I'm suspicious that this is causing our bad install, config.cwd is off on that bad path
-				//config.cwd = dir; //Already passed in as top level argument
+				config.cwd = dir; //Already passed in as top level argument
 				console.log('BowerEndpoint.prototype.download.resolve.spread config.cwd: ' + config.cwd);
 
 				config.directory = '';

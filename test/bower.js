@@ -279,18 +279,16 @@ describe('bower.js', function() {
 			var installBase = path.resolve('test/assets/install');
 
 			var installpath = function(usecase){
-
 				var path = installBase + '/';
-				//if(usecase.name){
-				//	path += usecase.name;
-				//} else {
+				if(usecase.name){
+					path += usecase.name;
+				} else {
 					path += usecase.pkg;
-				//}
+				}
 
 				//return installBase + '/'+ usecase.pkg + '@' + usecase.version;
 				path += '@' + usecase.version;
 				return path;
-
 			};
 
 			var bowerDownload = function(usecase){
