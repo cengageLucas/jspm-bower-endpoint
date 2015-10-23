@@ -287,7 +287,7 @@ describe('bower.js', function() {
 				}
 
 				//return installBase + '/'+ usecase.pkg + '@' + usecase.version;
-				path += '@' + usecase.version;
+				//path += '@' + usecase.version;
 				return path;
 			};
 
@@ -316,7 +316,7 @@ describe('bower.js', function() {
 							var file = installpath(usecase) + '/.bower.json';
 
 								console.log('This is pirate radio calling from inside hell');
-								var testPath = installBase + usecase.name + '/.bower.json';
+								var testPath = installBase + '/' + usecase.name + '/.bower.json';
 								console.log('Checking for .bower.json at ' + testPath);
 								var goodNamePath = fs.existsSync(testPath);
 								if(goodNamePath){
