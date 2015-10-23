@@ -50,7 +50,7 @@ var BowerEndpoint = module.exports = function BowerEndpoint (options, ui) {
 
 
 
-BowerEndpoint.prototype.locate = function (packageName){
+BowerEndpoint.prototype.locate = function (endpoint){
 
 	var fail = { notfound: true };
 	var repository = this._repository;
@@ -134,7 +134,21 @@ BowerEndpoint.prototype.lookup = function (packageName){
 	});
 };
 
-BowerEndpoint.prototype.download = function (packageName, version, hash, meta, dir){
+//TODO: packageName is used in other places too, going to want to change those
+//packageEndpoint is the actual syntax to find the package. Can just be the name in cases like bower registry
+//But name is needed for cases like bower_component=http://github.com/bower_component.git/... so we can get the real name and not install to a botched URL
+BowerEndpoint.prototype.download = function (endpoint, version, hash, meta, dir, name){ //TODO name is on end to fit existing calls, would rather have it earlier
+
+	console.log('BowerEndpoint.prototype.download: Calling!');
+	console.log('BowerEndpoint.prototype.download: endpoint: ', endpoint); //http://gitlab.com/2fd/jspm-bower-endpoint-test.git
+	console.log('BowerEndpoint.prototype.download: version: ' , version); //1.0.0
+	console.log('BowerEndpoint.prototype.download: hash: ', hash);
+	console.log('BowerEndpoint.prototype.download: meta: ' , meta);
+	console.log('BowerEndpoint.prototype.download: dir: ' , dir); ///Users/llowry/Dev/jspm-bower-endpoint/test/assets/install/http://gitlab.com/2fd/jspm-bower-endpoint-test.git@1.0.0
+	console.log('BowerEndpoint.prototype.download: out!');
+	//This block shows us that we need to either pass a name in, or derive it out of something
+
+	//TODO: Do we get a useful name BACK from anywhere? Maybe we don't need to pull it out ourselves.
 
 	var ui = this._ui;
 	var registry = this._endpoint;
@@ -145,20 +159,50 @@ BowerEndpoint.prototype.download = function (packageName, version, hash, meta, d
 
 	return Q.Promise(function(resolve, reject){
 
-		repository.resolve(packageName)
+		repository.resolve(endpoint)//Last use of endpoint here, turns into other data
 			.spread(function(ConcreteResolver, source){
 
-				var decEndpoints = bowerEndpointParser.decompose(source + '#' + version);
+				console.log('BowerEndpoint.prototype.download.resolve.spread: Calling!');
+				console.log('BowerEndpoint.prototype.download.resolve.spread ConcreteResolver: ' + ConcreteResolver); //Big GitRemoteResolver
+				console.log('BowerEndpoint.prototype.download.resolve.spread source: ' + source); //http://gitlab.com/2fd/jspm-bower-endpoint-test.git
+				//This block brings back the resolver, which may come into play here but I'm not sure yet
+
+				var decomposeString = source + '#' + version;
+				if(name) {
+					decomposeString = name + '=' + decomposeString; //Name needed to keep decomponse from coming back with no name, and us installing somewhere crazy
+				}
+				var decEndpoints = bowerEndpointParser.decompose(decomposeString);
 				var config = {};
 				mout.object.deepMixIn(config, bowerConfig);
-				config.cwd = dir;
+
+				//I'm suspicious that this is causing our bad install, config.cwd is off on that bad path
+				//config.cwd = dir; //Already passed in as top level argument
+				console.log('BowerEndpoint.prototype.download.resolve.spread config.cwd: ' + config.cwd);
+
 				config.directory = '';
 
 				var project = new Project( config, bowerLogger);
+
+				//Name is coming back now that name=endpoint syntax is used, but we're still installing to a url/path
+				console.log('BowerEndpoint.prototype.download.resolve.spread decEndpoints: ' + JSON.stringify(decEndpoints)); //{"name":"","source":"http://gitlab.com/2fd/jspm-bower-endpoint-test.git","target":"1.0.0"}
+				console.log('BowerEndpoint.prototype.download.resolve.spread project: ' + JSON.stringify(project)); //Big, no ready to use name string in here
+
+				console.log('BowerEndpoint.prototype.download.resolve.spread: Out!');
+				//This block has a blank name, which I'm curious to see if that's coming back blank or I'm passing in a blank name and it's just passing back
+
+
+				//TODO: What is the argument config we need here to install to the right path. We have the name, should be able to provide that path
+				//Bower API doc just wants to talk about the command line
+				//Source does not have inline doc
+
+				//Bower programattic API says to call bower.commands.install
+				//This appears to override bower.Project, not sure if that's going in some weird way, or why he's weaving this project in
+				//Assuming this wires up right, we have 4 possible events emitted from this
 				return project.install([decEndpoints], undefined, config);
 
 			})
 			.then(function(installed){
+
 
 
 				var pkg = mout.object.reduce(installed, function(pre, cur){
@@ -166,6 +210,16 @@ BowerEndpoint.prototype.download = function (packageName, version, hash, meta, d
 				});
 
 				var packageJson = new PackageAdapter(pkg.pkgMeta, registry);
+
+				console.log('BowerEndpoint.prototype.download.resolve.then: Calling!');
+				console.log('BowerEndpoint.prototype.download.resolve.then installed: ' + JSON.stringify(installed)); //Big, all names in full path
+				console.log('BowerEndpoint.prototype.download.resolve.then pkg: ' + JSON.stringify(pkg)); //Big, pull paths, and urls, no name on own
+				console.log('BowerEndpoint.prototype.download.resolve.then packageJson: ' + JSON.stringify(packageJson)); //This actually has a name field, for the product. In this case, it's 'pack', but this MAY be useful with a real package
+				console.log('BowerEndpoint.prototype.download.resolve.then: out!');
+				//This block shows me that we've got one piece of data coming back that might be useful
+				//but that's a bet, and relies on package structure.
+				//Package names, outside of this shitty test directory, appear to follow consistent names, so I'm after that
+				//Doesn't work, by the time we have a name here, the install to file system has already happened
 
 				return packageJson;
 			})
@@ -180,7 +234,7 @@ BowerEndpoint.prototype.download = function (packageName, version, hash, meta, d
 // BowerEndpoint.prototype.getPackageConfig (packageName, version, hash, meta) // optional
 // BowerEndpoint.prototype.processPackageConfig (pjson) // optional
 // BowerEndpoint.prototype.build (pjson, dir) // optional
-// BowerEndpoint.prototype.getOverride(endpoint, packageName, versionRange, override)
+// BowerEndpoint.prototype.getOverride(endpoint, endpoint, versionRange, override)
 
 // static
 // BowerEndpoint.packageFormat # RegExp

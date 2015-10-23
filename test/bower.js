@@ -17,7 +17,7 @@ describe('bower.js', function() {
 
 	var bower = new BowerEndpoint(optionsMock, uiMock);
 
-	it('instance', function () {
+	it.skip('instance', function () {
 
 		expect(bower).to.be.instanceOf(BowerEndpoint);
 
@@ -34,7 +34,7 @@ describe('bower.js', function() {
 		/**
 		 * locate
 		 */
-		describe('#locate', function(){
+		describe.skip('#locate', function(){
 
 			it('return Promise', function () {
 
@@ -194,7 +194,7 @@ describe('bower.js', function() {
 		/**
 		 * loockup
 		 */
-		describe('#loockup', function(){
+		describe.skip('#loockup', function(){
 
 			it('return Promise', function () {
 
@@ -267,12 +267,12 @@ describe('bower.js', function() {
 
 			var useCases = [
 
-				{ skip: false,  it: 'registered package', version: '0.9.0',  pkg : 'async'},
-				{ skip: false,  it: 'http package', 		version: '1.0.0',  pkg : 'http://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
-				{ skip: false,  it: 'https package', 		version: '1.0.0',  pkg : 'https://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
+				{ skip: true,  it: 'registered package', version: '0.9.0',  pkg : 'async'},
+				{ skip: false,  it: 'http package', name:'jspm-bower-endpoint-test',		version: '1.0.0',  pkg : 'http://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
+				{ skip: true,  it: 'https package', 		version: '1.0.0',  pkg : 'https://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
 				{ skip: true,  it: 'ssh package', 		version: '1.0.0',  pkg : 'git@gitlab.com:2fd/jspm-bower-endpoint-test.git'},
-				{ skip: false,  it: 'local file', 		version: 'latest', pkg : 'file:./test/assets/bower-package/other.js' },
-				{ skip: false,  it: 'local package', 		version: 'latest', pkg : 'file:./test/assets/bower-package' }
+				{ skip: true,  it: 'local file', 		version: 'latest', pkg : 'file:./test/assets/bower-package/other.js' },
+				{ skip: true,  it: 'local package', 		version: 'latest', pkg : 'file:./test/assets/bower-package' }
 
 			];
 
@@ -280,13 +280,23 @@ describe('bower.js', function() {
 
 			var installpath = function(usecase){
 
-				return installBase + '/'+ usecase.pkg + '@' + usecase.version;
+				var path = installBase + '/';
+				//if(usecase.name){
+				//	path += usecase.name;
+				//} else {
+					path += usecase.pkg;
+				//}
+
+				//return installBase + '/'+ usecase.pkg + '@' + usecase.version;
+				path += '@' + usecase.version;
+				return path;
 
 			};
 
 			var bowerDownload = function(usecase){
 
-				return bower.download(usecase.pkg, usecase.version, usecase.version, undefined, installpath(usecase))
+				//Looks lke installpath(usecase) may be the cause of our problems
+				return bower.download(usecase.pkg, usecase.version, usecase.version, undefined, installpath(usecase), usecase.name)
 
 			};
 
@@ -306,8 +316,21 @@ describe('bower.js', function() {
 							expect(installed).to.be.instanceOf(PackageAdapter);
 
 							var file = installpath(usecase) + '/.bower.json';
-							expect(fs.statSync( file ).isFile()).to.be.true;
-							expect( require(file) ).to.be.a('object');
+
+								console.log('This is pirate radio calling from inside hell');
+								var testPath = installBase + usecase.name + '/.bower.json';
+								console.log('Checking for .bower.json at ' + testPath);
+								var goodNamePath = fs.existsSync(testPath);
+								if(goodNamePath){
+									console.log('.bower.json is in the right place!');
+								} else {
+									console.log('.bower.json is not there yet, expect test to die');
+								}
+								console.log('Pirate Radio out!')
+								expect(goodNamePath).to.be.true;
+							//expect(fs.statSync( file ).isFile()).to.be.true;
+							//expect( require(file) ).to.be.a('object');
+
 							done();
 
 						});
