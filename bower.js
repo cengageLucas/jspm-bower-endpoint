@@ -49,8 +49,8 @@ var BowerEndpoint = module.exports = function BowerEndpoint (options, ui) {
 };
 
 
-
-BowerEndpoint.prototype.locate = function (endpoint){
+//TODO deal with changes to packageName/endpoint when test work again
+BowerEndpoint.prototype.locate = function (packageName){
 
 	var fail = { notfound: true };
 	var repository = this._repository;
@@ -175,13 +175,19 @@ BowerEndpoint.prototype.download = function (endpoint, version, hash, meta, dir,
 				var config = {};
 				mout.object.deepMixIn(config, bowerConfig);
 
-				//I'm suspicious that this is causing our bad install, config.cwd is off on that bad path
+				//DANGER DANGER DANGER: Comment this out and bad things happen
+				//Default behavior with this commented out will set it to '.'
+				//At test time this will BLOW AWAY YOUR SOURCE TREE
+				//INCLUDING YOUR GIT REPO.
 				config.cwd = dir; //Already passed in as top level argument
 				console.log('BowerEndpoint.prototype.download.resolve.spread config.cwd: ' + config.cwd);
 
 				config.directory = '';
 
 				var project = new Project( config, bowerLogger);
+
+				//TODO: Take out all this logging
+				//TODO: clean out all work comments
 
 				//Name is coming back now that name=endpoint syntax is used, but we're still installing to a url/path
 				console.log('BowerEndpoint.prototype.download.resolve.spread decEndpoints: ' + JSON.stringify(decEndpoints)); //{"name":"","source":"http://gitlab.com/2fd/jspm-bower-endpoint-test.git","target":"1.0.0"}

@@ -17,7 +17,7 @@ describe('bower.js', function() {
 
 	var bower = new BowerEndpoint(optionsMock, uiMock);
 
-	it.skip('instance', function () {
+	it('instance', function () {
 
 		expect(bower).to.be.instanceOf(BowerEndpoint);
 
@@ -34,7 +34,7 @@ describe('bower.js', function() {
 		/**
 		 * locate
 		 */
-		describe.skip('#locate', function(){
+		describe('#locate', function(){
 
 			it('return Promise', function () {
 
@@ -194,7 +194,7 @@ describe('bower.js', function() {
 		/**
 		 * loockup
 		 */
-		describe.skip('#loockup', function(){
+		describe('#loockup', function(){
 
 			it('return Promise', function () {
 
@@ -267,11 +267,15 @@ describe('bower.js', function() {
 
 			var useCases = [
 
-				{ skip: true,  it: 'registered package', version: '0.9.0',  pkg : 'async'},
+				{ skip: false,  it: 'registered package', name: 'async', version: '0.9.0',  pkg : 'async'},
 				{ skip: false,  it: 'http package', name:'jspm-bower-endpoint-test',		version: '1.0.0',  pkg : 'http://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
-				{ skip: true,  it: 'https package', 		version: '1.0.0',  pkg : 'https://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
+				{ skip: false,  it: 'https package',  name:'jspm-bower-endpoint-test', version: '1.0.0',  pkg : 'https://gitlab.com/2fd/jspm-bower-endpoint-test.git'},
 				{ skip: true,  it: 'ssh package', 		version: '1.0.0',  pkg : 'git@gitlab.com:2fd/jspm-bower-endpoint-test.git'},
+				//KNOWN_ISSUE
+				//Local file still installs to a strange path
 				{ skip: true,  it: 'local file', 		version: 'latest', pkg : 'file:./test/assets/bower-package/other.js' },
+				//KNOWN_ISSUE
+				//Local package still installs to a strange path
 				{ skip: true,  it: 'local package', 		version: 'latest', pkg : 'file:./test/assets/bower-package' }
 
 			];
