@@ -290,14 +290,10 @@ describe('bower.js', function() {
 					path += usecase.pkg;
 				}
 
-				//return installBase + '/'+ usecase.pkg + '@' + usecase.version;
-				//path += '@' + usecase.version;
 				return path;
 			};
 
 			var bowerDownload = function(usecase){
-
-				//Looks lke installpath(usecase) may be the cause of our problems
 				return bower.download(usecase.pkg, usecase.version, usecase.version, undefined, installpath(usecase), usecase.name)
 
 			};
@@ -318,20 +314,9 @@ describe('bower.js', function() {
 							expect(installed).to.be.instanceOf(PackageAdapter);
 
 							var file = installpath(usecase) + '/.bower.json';
-
-								console.log('This is pirate radio calling from inside hell');
-								var testPath = installBase + '/' + usecase.name + '/.bower.json';
-								console.log('Checking for .bower.json at ' + testPath);
-								var goodNamePath = fs.existsSync(testPath);
-								if(goodNamePath){
-									console.log('.bower.json is in the right place!');
-								} else {
-									console.log('.bower.json is not there yet, expect test to die');
-								}
-								console.log('Pirate Radio out!')
-								expect(goodNamePath).to.be.true;
-							//expect(fs.statSync( file ).isFile()).to.be.true;
-							//expect( require(file) ).to.be.a('object');
+							var testPath = installBase + '/' + usecase.name + '/.bower.json';
+							var goodNamePath = fs.existsSync(testPath);
+							expect(goodNamePath).to.be.true;
 
 							done();
 
