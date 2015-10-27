@@ -1,3 +1,17 @@
+# Lucas's Cengage Fork of JSPM Bower Endpoint
+This is a fork of JSPM Bower Endpoint, made to fix the failing
+HTML case. Downloads from endpoints other than the
+bower registry did not handle package names and paths
+correctly. This has been fixed to handle that case.
+
+It has not been integrated with MT4 yet.
+
+It has not been improved past that needed fix.
+
+Known issues can be found by grepping for KNOWN_ISSUE.
+
+# Old JSPM Bower Endpoint Readme
+
 # JSPM Bower Endpoint
 [![License](https://img.shields.io/npm/l/jspm-bower-endpoint.svg?style=flat-square)](https://github.com/2fd/jspm-bower-endpoint/blob/master/LICENSE)
 [![Build Status](https://img.shields.io/travis/2fd/jspm-bower-endpoint.svg?style=flat-square)](https://travis-ci.org/2fd/jspm-bower-endpoint)
